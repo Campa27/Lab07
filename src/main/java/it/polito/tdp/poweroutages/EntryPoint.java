@@ -28,7 +28,7 @@ public class EntryPoint extends Application {
         Model model = new Model();
         controller.setModel(model);
                 
-        
+        scene.getRoot().setStyle("-fx-font-family: 'serif'");
         stage.setTitle("JavaFX and Maven");
         stage.setScene(scene);
         stage.show();

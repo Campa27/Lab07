@@ -1,13 +1,14 @@
-/**
- * Sample Skeleton for 'Scene.fxml' Controller Class
+ /* Sample Skeleton for 'Scene.fxml' Controller Class
  */
 
 package it.polito.tdp.poweroutages;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import it.polito.tdp.poweroutages.model.Model;
 import it.polito.tdp.poweroutages.model.Nerc;
+import it.polito.tdp.poweroutages.model.Outage;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -35,10 +36,15 @@ public class FXMLController {
     private TextArea txtResult; // Value injected by FXMLLoader
 
     private Model model;
+    private List<Nerc> listaNerc;
     
     @FXML
     void doRun(ActionEvent event) {
     	txtResult.clear();
+    	List<Outage> result = model.WorstCaseAnalysis(cmbNerc.getValue(), Integer.parseInt(txtYears.getText()), Integer.parseInt(txtHours.getText()));
+    	for(Outage o : result) {
+    		txtResult.appendText(o.toString());
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -50,9 +56,16 @@ public class FXMLController {
         
         // Utilizzare questo font per incolonnare correttamente i dati;
         txtResult.setStyle("-fx-font-family: monospace");
-    }
+        }
     
     public void setModel(Model model) {
     	this.model = model;
+    	popolacombo();
     }
+
+	private void popolacombo() {
+		listaNerc = this.model.getNercList();
+		cmbNerc.getItems().add(new Nerc(0, ""));
+    	this.cmbNerc.getItems().addAll(listaNerc);
+	}
 }
