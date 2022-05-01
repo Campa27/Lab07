@@ -1,6 +1,7 @@
 package it.polito.tdp.poweroutages.model;
 
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 public class Outage {
@@ -8,18 +9,17 @@ public class Outage {
 	private int id;
 	private int NercId;
 	private int customers_affected;
-	private LocalDate date_event_began;
-	private LocalDate date_event_finished;
-	private int diff;
+	private LocalDateTime date_event_began;
+	private LocalDateTime date_event_finished;
+	private long diff;
 	
-	public Outage(int id, int nercId, int customers_affected, LocalDate date_event_began, LocalDate date_event_finished,
-			int diff) {
+	public Outage(int id, int nercId, int customers_affected, LocalDateTime date_event_began, LocalDateTime date_event_finished) {
 		this.id = id;
 		NercId = nercId;
 		this.customers_affected = customers_affected;
 		this.date_event_began = date_event_began;
 		this.date_event_finished = date_event_finished;
-		this.diff = diff;
+		diff = date_event_began.until(date_event_finished, ChronoUnit.HOURS);
 	}
 
 	public int getId() {
@@ -46,27 +46,27 @@ public class Outage {
 		this.customers_affected = customers_affected;
 	}
 
-	public LocalDate getDate_event_began() {
+	public LocalDateTime getDate_event_began() {
 		return date_event_began;
 	}
 
-	public void setDate_event_began(LocalDate date_event_began) {
+	public void setDate_event_began(LocalDateTime date_event_began) {
 		this.date_event_began = date_event_began;
 	}
 
-	public LocalDate getDate_event_finished() {
+	public LocalDateTime getDate_event_finished() {
 		return date_event_finished;
 	}
 
-	public void setDate_event_finished(LocalDate date_event_finished) {
+	public void setDate_event_finished(LocalDateTime date_event_finished) {
 		this.date_event_finished = date_event_finished;
 	}
 
-	public int getDiff() {
+	public long getDiff() {
 		return diff;
 	}
 
-	public void setDiff(int diff) {
+	public void setDiff(long diff) {
 		this.diff = diff;
 	}
 
@@ -89,9 +89,7 @@ public class Outage {
 
 	@Override
 	public String toString() {
-		return "Outage [id=" + id + ", NercId=" + NercId + ", customers_affected=" + customers_affected
-				+ ", date_event_began=" + date_event_began + ", date_event_finished=" + date_event_finished + ", diff="
-				+ diff + "]";
+		return "Outage id: " + id + " clienti affetti: " + customers_affected + " ore di blackout: " + diff;
 	}
 	
 }

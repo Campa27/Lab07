@@ -43,7 +43,7 @@ public class FXMLController {
     	txtResult.clear();
     	List<Outage> result = model.WorstCaseAnalysis(cmbNerc.getValue(), Integer.parseInt(txtYears.getText()), Integer.parseInt(txtHours.getText()));
     	for(Outage o : result) {
-    		txtResult.appendText(o.toString());
+    		txtResult.appendText(o.toString() + "\n");
     	}
     }
 

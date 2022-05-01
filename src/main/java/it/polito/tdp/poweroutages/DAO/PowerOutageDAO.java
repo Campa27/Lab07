@@ -38,7 +38,7 @@ public class PowerOutageDAO {
 	
 	public List<Outage> getOutagesByNerc(Nerc n){
 		
-		String sql ="select id, nerc_id, customers_affected, date_event_began, date_event_finished, datediff(date_event_finished, date_event_began) as 'diff' "
+		String sql ="select id, nerc_id, customers_affected, date_event_began, date_event_finished " //timediff(date_event_finished, date_event_began) as 'diff' "
 				+ "from PowerOutages "
 				+ "where nerc_id = ? "
 				+ "order by date_event_began";
@@ -52,7 +52,7 @@ public class PowerOutageDAO {
 			ResultSet res = st.executeQuery();
 
 			while (res.next()) {
-				Outage o = new Outage(res.getInt("id"), res.getInt("nerc_id"), res.getInt("customers_affected"),  res.getDate("date_event_began").toLocalDate(), res.getDate("date_event_finished").toLocalDate(), res.getInt("diff"));
+				Outage o = new Outage(res.getInt("id"), res.getInt("nerc_id"), res.getInt("customers_affected"),  res.getTimestamp("date_event_began").toLocalDateTime(), res.getTimestamp("date_event_finished").toLocalDateTime());
 				outagesList.add(o);
 			}
 

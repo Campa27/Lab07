@@ -1,7 +1,5 @@
 package it.polito.tdp.poweroutages.model;
 
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +10,8 @@ public class Model {
 	PowerOutageDAO podao;
 	List<Outage> result;
 	List<Outage> start;
-	int ore = 0;
-	
-	
+	int oreMax = 0;
+	int anniMax = 0;
 	
 	public Model() {
 		podao = new PowerOutageDAO();
@@ -28,50 +25,61 @@ public class Model {
 		return podao.getOutagesByNerc(n);
 	}
 	
-	public List<Outage> WorstCaseAnalysis(Nerc n, int x, int y) {
-		start = new ArrayList<Outage>(getOutagesByNerc(n));
-		List<Outage> parziale = new ArrayList<Outage>();
-		result = null;
-		WorstCaseAnalysisRicorsiva(parziale, x, y);		//y è il livello, ossia il numero
-		return result;											//totale di ore di disservizio
+	public List<Outage> WorstCaseAnalysis(Nerc n, int x, int y) {														
+		anniMax = x;													
+		oreMax = y;
+		start = new ArrayList<Outage>(getOutagesByNerc(n));				//creo la lista di Outages relativi al Nerc richiesto
+		List<Outage> parziale = new ArrayList<Outage>();				//creo parziale, per ora vuota
+		result = null;													//inizializzo a vuota la lista dei risultati
+		WorstCaseAnalysisRicorsiva(parziale, 0);						//il livello é: il numero totale di ore di disservizio
+		return result;													
 	}
 
-	private void WorstCaseAnalysisRicorsiva(List<Outage> parziale, int x, int y) {
-		if(ore == y) {
+	private void WorstCaseAnalysisRicorsiva(List<Outage> parziale, int Livello) {
+		if(Livello > oreMax) {
+			return;
+		}
+		if(Livello == oreMax || parziale.size() == start.size()) {							//caso terminale
 			int persone_coinvolte = personeCoinvolte(parziale);
 			
-			if(result == null || persone_coinvolte < personeCoinvolte(result)) {
+			if(result == null || persone_coinvolte > personeCoinvolte(result)) {
 				result = new ArrayList<Outage>(parziale);
 			} 
-		} else {
+		} else {																			//caso intermedio
 			for(Outage o : start) {
-				if(valido(o, x, parziale)) {
-					parziale.add(o);
-					WorstCaseAnalysisRicorsiva(parziale, x, y-contaOre(parziale));
-					parziale.remove(parziale.size()-1);
+				if(parziale.isEmpty() || parziale.contains(o) == false) {
+					if(possoAggiungere(o, parziale) == true) {
+						parziale.add(o);
+						WorstCaseAnalysisRicorsiva(parziale, contaOre(parziale));
+						parziale.remove(parziale.size()-1);
+					}
 				}
 			}
 		}
 	}
 	
-	private boolean valido(Outage o, int x, List<Outage> parziale) {
-		LocalDate piuVecchio = null;
-		LocalDate piuRecente = null;
+	private boolean possoAggiungere(Outage o, List<Outage> parziale) {
+		int piuVecchio = 0;
+		int piuRecente = 0;
 		
-		if(parziale.isEmpty()) {
+		List<Outage> prova = new ArrayList<Outage>(parziale);
+		
+		if(prova.isEmpty()) {
 			return true;
 		} else {
-			for(Outage outage : parziale) {
-				if(piuVecchio == null || outage.getDate_event_began().isBefore(piuVecchio)) {
-					piuVecchio = outage.getDate_event_began();
+			prova.add(o);
+			
+			for(Outage outage : prova) {
+				if(piuVecchio == 0 || outage.getDate_event_began().getYear() < piuVecchio) {
+					piuVecchio = outage.getDate_event_began().getYear();
 				}
 			
-				if(piuRecente == null || outage.getDate_event_began().isAfter(piuRecente)) {
-					piuRecente = outage.getDate_event_began();
+				if(piuRecente == 0 || outage.getDate_event_began().getYear() > piuRecente) {
+					piuRecente = outage.getDate_event_began().getYear();
 				}
 			}
 		
-			if(Period.between(piuRecente, piuVecchio).getYears() > x) {
+			if((piuRecente - piuVecchio) > anniMax) {
 				return false;
 			} else {
 				return true;
