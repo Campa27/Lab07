@@ -39,20 +39,19 @@ public class Model {
 		if(Livello > oreMax) {
 			return;
 		}
-		if(Livello == oreMax || parziale.size() == start.size()) {							//caso terminale
+		if(Livello <= oreMax || parziale.size() == start.size()) {							//caso terminale se le persone coinvolte sono di più del caso precedente
 			int persone_coinvolte = personeCoinvolte(parziale);
 			
 			if(result == null || persone_coinvolte > personeCoinvolte(result)) {
 				result = new ArrayList<Outage>(parziale);
 			} 
-		} else {																			//caso intermedio
-			for(Outage o : start) {
-				if(parziale.isEmpty() || parziale.contains(o) == false) {
-					if(possoAggiungere(o, parziale) == true) {
-						parziale.add(o);
-						WorstCaseAnalysisRicorsiva(parziale, contaOre(parziale));
-						parziale.remove(parziale.size()-1);
-					}
+		}																					//caso intermedio
+		for(Outage o : start) {
+			if(parziale.isEmpty() || parziale.contains(o) == false) {
+				if(possoAggiungere(o, parziale) == true) {
+					parziale.add(o);
+					WorstCaseAnalysisRicorsiva(parziale, contaOre(parziale));
+					parziale.remove(parziale.size()-1);
 				}
 			}
 		}
